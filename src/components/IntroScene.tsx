@@ -1,7 +1,7 @@
-import React from 'react';
-import { m } from 'motion/react';
+import React, { useRef } from 'react';
+import { m, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
 import { ArrowLeft, UtensilsCrossed } from 'lucide-react';
-import { BotanicalDivider } from './BotanicalOrnament';
+import { BotanicalDivider, LeafCornerMark } from './BotanicalOrnament';
 import { ResponsiveImage } from './ResponsiveImage';
 
 const FEATURED_PEDESTALS = [
@@ -32,12 +32,49 @@ const FEATURED_PEDESTALS = [
 ];
 
 export const IntroScene: React.FC = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 24,
+    mass: 0.4,
+  });
+
+  const leafY = useTransform(smoothProgress, [0, 1], ['36px', '-36px']);
+  const leafRotate = useTransform(smoothProgress, [0, 1], [-8, 12]);
+  const aboutY = useTransform(smoothProgress, [0, 1], ['18px', '-18px']);
+
+  const pedestalY0 = useTransform(smoothProgress, [0, 1], ['22px', '-14px']);
+  const pedestalY1 = useTransform(smoothProgress, [0, 1], ['32px', '-22px']);
+  const pedestalY2 = useTransform(smoothProgress, [0, 1], ['42px', '-30px']);
+  const pedestalYs = [pedestalY0, pedestalY1, pedestalY2];
+
+  const pedestalR0 = useTransform(smoothProgress, [0, 1], [-1.5, 1.2]);
+  const pedestalR1 = useTransform(smoothProgress, [0, 1], [1.2, -1.2]);
+  const pedestalR2 = useTransform(smoothProgress, [0, 1], [-1.2, 1.5]);
+  const pedestalRotates = [pedestalR0, pedestalR1, pedestalR2];
+
   return (
     <section
       id="about"
+      ref={sectionRef}
       className="relative overflow-hidden bg-[#F5F0E6] py-16 text-[#171615] sm:py-24"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Floating Botanical Parallax Accent */}
+      <m.div
+        aria-hidden="true"
+        style={prefersReducedMotion ? undefined : { y: leafY, rotate: leafRotate }}
+        className="pointer-events-none absolute -top-6 -right-8 z-0 will-change-transform"
+      >
+        <LeafCornerMark className="h-52 w-52 text-[#C69A63]/28" />
+      </m.div>
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-14">
           {/* Stepped Diagonal Plinth Showcase ("Our Menu / Featured Dishes") */}
           <div className="lg:col-span-6">
@@ -57,38 +94,54 @@ export const IntroScene: React.FC = () => {
 
             <div className="mt-8 flex flex-col gap-6 sm:gap-7">
               {FEATURED_PEDESTALS.map((item, idx) => (
-                <m.a
+                <m.div
                   key={item.id}
-                  href="#menu"
-                  initial={{ opacity: 0, y: 22 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                  className={`group flex items-center gap-4 rounded-2xl border border-[#171615]/10 border-b-[5px] border-b-[#D8D0C4] bg-[#FAF7F2] p-3.5 shadow-[0_18px_36px_rgba(23,22,21,0.10)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-[#762B35] sm:gap-5 sm:p-4 ${item.offsetClass}`}
+                  style={
+                    prefersReducedMotion
+                      ? undefined
+                      : { y: pedestalYs[idx], rotate: pedestalRotates[idx] }
+                  }
+                  className={`will-change-transform ${item.offsetClass}`}
                 >
-                  <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-[#EBE3D4] sm:h-24 sm:w-28">
-                    <ResponsiveImage
-                      src={item.src}
-                      alt={item.alt}
-                      sizes="(max-width: 640px) 96px, 112px"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-base font-bold leading-snug text-[#171615] sm:text-lg">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-[#575049] sm:text-sm">
-                      {item.subtitle}
-                    </p>
-                  </div>
-                  <span
-                    aria-hidden="true"
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#171615]/10 bg-[#EBE3D4]/60 text-[#171615] transition-colors group-hover:bg-[#171615] group-hover:text-[#F5F0E6]"
+                  <m.a
+                    href="#menu"
+                    data-cursor="dish"
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.015 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 260,
+                      damping: 22,
+                      delay: idx * 0.06,
+                    }}
+                    className="group flex items-center gap-4 rounded-2xl border border-[#171615]/10 border-b-[5px] border-b-[#D8D0C4] bg-[#FAF7F2] p-3.5 shadow-[0_18px_36px_rgba(23,22,21,0.10)] transition-shadow duration-300 hover:shadow-[0_24px_48px_rgba(23,22,21,0.16)] focus-visible:outline-2 focus-visible:outline-[#762B35] sm:gap-5 sm:p-4"
                   >
-                    <ArrowLeft className="h-4 w-4" />
-                  </span>
-                </m.a>
+                    <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-[#EBE3D4] sm:h-24 sm:w-28">
+                      <ResponsiveImage
+                        src={item.src}
+                        alt={item.alt}
+                        sizes="(max-width: 640px) 96px, 112px"
+                        className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108 group-hover:rotate-3"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-display text-base font-bold leading-snug text-[#171615] sm:text-lg">
+                        {item.title}
+                      </h3>
+                      <p className="mt-1 text-xs leading-relaxed text-[#575049] sm:text-sm">
+                        {item.subtitle}
+                      </p>
+                    </div>
+                    <span
+                      aria-hidden="true"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#171615]/10 bg-[#EBE3D4]/60 text-[#171615] transition-all duration-300 group-hover:-translate-x-1 group-hover:bg-[#171615] group-hover:text-[#F5F0E6]"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </span>
+                  </m.a>
+                </m.div>
               ))}
             </div>
           </div>
@@ -96,17 +149,19 @@ export const IntroScene: React.FC = () => {
           {/* Dark Framed "About Us" Photo Card + Editorial Hospitality Block */}
           <div className="flex flex-col gap-8 lg:col-span-6">
             <m.div
+              style={prefersReducedMotion ? undefined : { y: aboutY }}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative min-h-[340px] overflow-hidden rounded-3xl border border-[#171615]/12 bg-[#171615] shadow-[0_20px_50px_rgba(23,22,21,0.14)] sm:min-h-[380px]"
+              data-cursor="dish"
+              className="group relative min-h-[340px] overflow-hidden rounded-3xl border border-[#171615]/12 bg-[#171615] shadow-[0_20px_50px_rgba(23,22,21,0.14)] will-change-transform sm:min-h-[380px]"
             >
               <ResponsiveImage
                 src="/assets/official/002.jpg"
                 alt="لحم محمر على الأرز الشرقي باللوز من مطبخ زهور الشفاء"
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#171615]/94 via-[#171615]/58 to-[#171615]/25" />
 
@@ -150,7 +205,7 @@ export const IntroScene: React.FC = () => {
                 </p>
                 <a
                   href="#menu"
-                  className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#C69A63] px-6 text-sm font-semibold leading-none text-[#171615] transition-colors hover:bg-[#D7B485] focus-visible:outline-2 focus-visible:outline-[#762B35]"
+                  className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#C69A63] px-6 text-sm font-semibold leading-none text-[#171615] transition-transform duration-200 hover:scale-[1.03] hover:bg-[#D7B485] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-[#762B35]"
                 >
                   <UtensilsCrossed className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span>تصفح المنيو الكامل</span>

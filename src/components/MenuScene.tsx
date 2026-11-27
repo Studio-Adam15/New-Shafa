@@ -85,7 +85,7 @@ export const MenuScene: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Filter Tabs */}
+        {/* Category Filter Tabs with Sliding Spring Indicator */}
         <div
           role="tablist"
           aria-label="أقسام قائمة الطعام"
@@ -100,13 +100,21 @@ export const MenuScene: React.FC = () => {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setSelectedCategoryId(category.id)}
-                className={`inline-flex h-11 shrink-0 items-center justify-center rounded-full border px-5 text-sm font-medium leading-none whitespace-nowrap transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#762B35] ${
+                className={`relative inline-flex h-11 shrink-0 items-center justify-center rounded-full border px-5 text-sm leading-none whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-[#762B35] ${
                   isActive
-                    ? 'border-[#762B35] bg-[#762B35] text-[#F5F0E6] font-semibold shadow-sm'
-                    : 'border-[#171615]/12 bg-[#FAF7F2] text-[#4F4942] hover:border-[#171615]/30 hover:text-[#171615]'
+                    ? 'border-[#762B35] text-[#F5F0E6] font-semibold'
+                    : 'border-[#171615]/12 bg-[#FAF7F2] text-[#4F4942] font-medium hover:border-[#171615]/30 hover:text-[#171615]'
                 }`}
               >
-                {category.title}
+                {isActive && (
+                  <m.span
+                    layoutId="menu-category-pill"
+                    aria-hidden="true"
+                    className="absolute inset-0 rounded-full bg-[#762B35] shadow-sm"
+                    transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+                  />
+                )}
+                <span className="relative z-10">{category.title}</span>
               </button>
             );
           })}
@@ -118,10 +126,10 @@ export const MenuScene: React.FC = () => {
             <AnimatePresence mode="wait">
               <m.div
                 key={`${serviceMode}-${activeCategory.id}`}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                 className="rounded-3xl border border-[#171615]/10 bg-[#FAF7F2] p-5 shadow-[0_14px_40px_rgba(23,22,21,0.06)] sm:p-8"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#171615]/10 pb-5">
@@ -213,23 +221,24 @@ export const MenuScene: React.FC = () => {
             )}
           </div>
 
-          {/* Sticky Category Dish Visual Column */}
+          {/* Sticky Category Dish Visual Column with Plate Rotation Transition */}
           <div className="lg:sticky lg:top-24 lg:col-span-5">
             <AnimatePresence mode="wait">
               <m.div
                 key={activeCategory.id}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden rounded-3xl border border-[#171615]/10 bg-[#FAF7F2] shadow-[0_14px_40px_rgba(23,22,21,0.08)]"
+                data-cursor="dish"
+                initial={{ opacity: 0, scale: 0.94, rotate: -3 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.96, rotate: 2 }}
+                transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                className="group overflow-hidden rounded-3xl border border-[#171615]/10 bg-[#FAF7F2] shadow-[0_14px_40px_rgba(23,22,21,0.08)]"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden">
                   <ResponsiveImage
                     src={activeCategory.previewImage}
                     alt={activeCategory.previewAlt}
                     sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:rotate-1"
                   />
                 </div>
                 <div className="p-5 sm:p-6">

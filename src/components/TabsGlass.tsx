@@ -67,10 +67,10 @@ export const TabsGlass: React.FC<TabsGlassProps> = ({
       <AnimatePresence mode="wait">
         <m.div
           key={`${activeTab.id}-${bgImage}`}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          initial={{ opacity: 0, scale: 1.06, rotate: -1 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          exit={{ opacity: 0, scale: 1.02, rotate: 0.8 }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0"
         >
           <ResponsiveImage

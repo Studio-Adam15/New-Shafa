@@ -1,11 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Camera, ExternalLink, Flame, Play, X } from 'lucide-react';
-import { AnimatePresence, m } from 'motion/react';
+import {
+  AnimatePresence,
+  m,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'motion/react';
 import { VERIFIED_VIDEOS, VerifiedVideo } from '../data/restaurantMedia';
 import { ResponsiveImage } from './ResponsiveImage';
 
 export const GrillScene: React.FC = () => {
   const [activeVideo, setActiveVideo] = useState<VerifiedVideo | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 24,
+    mass: 0.4,
+  });
+
+  const panY = useTransform(smoothProgress, [0, 1], ['16px', '-16px']);
+  const saladY = useTransform(smoothProgress, [0, 1], ['-14px', '18px']);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -26,6 +48,7 @@ export const GrillScene: React.FC = () => {
   return (
     <section
       id="grill"
+      ref={sectionRef}
       className="bg-[#F5F0E6] py-12 text-[#171615] sm:py-16"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -56,7 +79,7 @@ export const GrillScene: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveVideo(VERIFIED_VIDEOS[0])}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#171615] px-5 text-xs font-semibold leading-none text-[#F5F0E6] whitespace-nowrap transition-colors hover:bg-[#762B35] focus-visible:outline-2 focus-visible:outline-[#762B35] sm:text-sm"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#171615] px-5 text-xs font-semibold leading-none text-[#F5F0E6] whitespace-nowrap transition-all duration-200 hover:scale-[1.03] hover:bg-[#762B35] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-[#762B35] sm:text-sm"
               >
                 <Play className="h-3.5 w-3.5 fill-current shrink-0" aria-hidden="true" />
                 <span>شاهد الفيديوهات</span>
@@ -66,17 +89,19 @@ export const GrillScene: React.FC = () => {
 
           {/* Card 2: Live Copper Pan Photo */}
           <m.div
+            data-cursor="dish"
+            style={prefersReducedMotion ? undefined : { y: panY }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.65, delay: 0.06, ease: [0.16, 1, 0.3, 1] }}
-            className="group relative min-h-[260px] overflow-hidden rounded-3xl border border-[#171615]/10 bg-[#171615]"
+            className="group relative min-h-[260px] overflow-hidden rounded-3xl border border-[#171615]/10 bg-[#171615] will-change-transform"
           >
             <ResponsiveImage
               src="/assets/official/Zohoor-Al-Shafa-Pan-scaled.jpg"
               alt="شيف مطعم زهور الشفاء يحضر القلايات والمشاوي على اللهب المباشر"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 group-hover:rotate-1"
             />
           </m.div>
 
@@ -104,7 +129,7 @@ export const GrillScene: React.FC = () => {
             <div className="mt-6">
               <a
                 href="#gallery"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#171615] px-5 text-xs font-semibold leading-none text-[#F5F0E6] whitespace-nowrap transition-colors hover:bg-[#762B35] focus-visible:outline-2 focus-visible:outline-[#762B35] sm:text-sm"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#171615] px-5 text-xs font-semibold leading-none text-[#F5F0E6] whitespace-nowrap transition-all duration-200 hover:scale-[1.03] hover:bg-[#762B35] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-[#762B35] sm:text-sm"
               >
                 <span>استكشف المعرض</span>
               </a>
@@ -113,17 +138,19 @@ export const GrillScene: React.FC = () => {
 
           {/* Card 4: Fresh Salad & Mezze Photo */}
           <m.div
+            data-cursor="dish"
+            style={prefersReducedMotion ? undefined : { y: saladY }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.65, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="group relative min-h-[260px] overflow-hidden rounded-3xl border border-[#171615]/10 bg-[#171615]"
+            className="group relative min-h-[260px] overflow-hidden rounded-3xl border border-[#171615]/10 bg-[#171615] will-change-transform"
           >
             <ResponsiveImage
               src="/assets/official/Zohoor-Al-Shafa-Salad-scaled.jpg"
               alt="سلطة فتوش طازجة بالخبز المحمص والليمون في مطعم زهور الشفاء"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 group-hover:-rotate-1"
             />
           </m.div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Flame, Leaf, MoveLeft, Users, UtensilsCrossed } from 'lucide-react';
-import { m, useScroll, useTransform } from 'motion/react';
+import { m, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
 
 const PRINCIPLES = [
   {
@@ -47,19 +47,28 @@ const PRINCIPLES = [
 
 export const PrinciplesScene: React.FC = () => {
   const targetRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ['start start', 'end end'],
   });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 26,
+    mass: 0.4,
+  });
 
   // In RTL layout, shifting right (+X) reveals leftward cards cleanly across scroll
-  const x = useTransform(scrollYProgress, [0, 1], ['0%', '37%']);
+  const x = useTransform(smoothProgress, [0, 1], ['0%', '37%']);
 
   return (
     <section
       ref={targetRef}
       aria-labelledby="principles-heading"
-      className="relative border-y border-[#171615]/10 bg-[#EBE3D4] text-[#171615] lg:h-[210vh]"
+      className={`relative border-y border-[#171615]/10 bg-[#EBE3D4] text-[#171615] ${
+        prefersReducedMotion ? '' : 'lg:h-[210vh]'
+      }`}
     >
       {/* Mobile & Tablet Grid Layout (< lg) */}
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:hidden">
@@ -115,7 +124,10 @@ export const PrinciplesScene: React.FC = () => {
 
       {/* Desktop Sticky Scroll Horizontal Showcase (lg+) */}
       <div className="hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:items-center lg:overflow-hidden">
-        <m.div style={{ x }} className="flex items-stretch gap-8 px-12 xl:px-20">
+        <m.div
+          style={prefersReducedMotion ? undefined : { x }}
+          className="flex items-stretch gap-8 px-12 xl:px-20 will-change-transform"
+        >
           <div className="flex w-[32vw] max-w-md shrink-0 flex-col justify-center pl-4">
             <p className="text-xs font-semibold text-[#762B35]">
               أصول الضيافة · زهور الشفاء

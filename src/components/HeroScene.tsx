@@ -69,8 +69,10 @@ export const HeroScene: React.FC = () => {
                 <div
                   key={slide.id}
                   aria-hidden={!isActive}
-                  className={`absolute inset-0 transition-opacity duration-700 ease-out ${
-                    isActive ? 'opacity-100' : 'pointer-events-none opacity-0'
+                  className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                    isActive
+                      ? 'opacity-100 scale-100 rotate-0'
+                      : 'pointer-events-none opacity-0 scale-[1.05] rotate-[0.8deg]'
                   }`}
                 >
                   <picture>
