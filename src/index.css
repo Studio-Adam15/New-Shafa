@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal: #171615;
+  --color-charcoal-soft: #24211F;
+  --color-cream: #F5F0E6;
+  --color-cream-muted: #D8D0C4;
+  --color-muted: #B9B2A8;
+  --color-muted-dark: #635D55;
+  --color-burgundy: #762B35;
+  --color-burgundy-hover: #8C3440;
+  --color-gold: #C69A63;
+  --color-gold-soft: #D7B485;
+
+  --font-display: "Alexandria", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans Arabic", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: #F5F0E6;
+    color: #171615;
+    overflow-x: clip;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: 0;
+  }
+}
+
+.hero-title {
+  font-size: clamp(2.4rem, 5.8vw, 4.75rem);
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+
+.hero-subtitle {
+  font-size: clamp(1.35rem, 3vw, 2.4rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.section-title {
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  line-height: 1.32;
+  letter-spacing: 0;
+}
+
+@keyframes slowKenBurns {
+  0% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: scale(1.09);
+  }
+}
+
+.animate-ken-burns {
+  animation: slowKenBurns 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes heroFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroGlowPulse {
+  0%, 100% {
+    opacity: 0.16;
+  }
+  50% {
+    opacity: 0.28;
+  }
+}
+
+@keyframes scrollLineDrop {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+.animate-hero-fade-up {
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-hero-glow {
+  animation: heroGlowPulse 6s ease-in-out infinite;
+}
+
+.animate-scroll-drop {
+  animation: scrollLineDrop 1.6s ease-in-out infinite;
+}
+
+@keyframes marqueeRtl {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+.animate-marquee-rtl {
+  animation: marqueeRtl 40s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-ken-burns,
+  .animate-hero-fade-up,
+  .animate-hero-glow,
+  .animate-scroll-drop,
+  .animate-marquee-rtl {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+}
+
+

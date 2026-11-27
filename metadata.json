@@ -1,0 +1,6 @@
+{
+  "name": "زهور الشفاء | مطعم زهور الشفاء أبو نصير",
+  "description": "مطعم زهور الشفاء في أبو نصير، عمان. اكتشف أطباقنا وأجواء المطعم وموقعنا، وخطط لزيارتك القادمة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
